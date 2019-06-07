@@ -57,7 +57,7 @@ _, img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
 
 
 # %% In[3]: Contours, Hull, Defect Raw Data
-_, c, __ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+c, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 h = cv2.convexHull(c[0], returnPoints = False)
 hp = list(filter(lambda x: x[0][1] > img.shape[0] / 4, cv2.convexHull(c[0])))
 df = cv2.convexityDefects(c[0], h)
@@ -92,35 +92,30 @@ MIDDLE_A.setPoints([
     np.rint(tips[2] - between[2] * 0.5 + between[1] * 0.5).astype(int),
     np.rint(tips[2] + between[2] * 0.5 - between[1] * 0.5).astype(int)
 ])
-
 MIDDLE_B.setPoints([
     np.rint((tips[2] * 1 / 3 + between[1] / 3 + between[2] / 3) - between[2] * 0.5 + between[1] * 0.5).astype(int),
     np.rint((tips[2] * 1 / 3 + between[1] / 3 + between[2] / 3) + between[2] * 0.5 - between[1] * 0.5).astype(int),
     np.rint((tips[2] * 2 / 3 + between[1] / 6 + between[2] / 6) - between[2] * 0.5 + between[1] * 0.5).astype(int),
     np.rint((tips[2] * 2 / 3 + between[1] / 6 + between[2] / 6) + between[2] * 0.5 - between[1] * 0.5).astype(int)
 ])
-
 MIDDLE_C.setPoints([
     between[1],
     between[2],
     np.rint((tips[2] * 1 / 3 + between[1] / 3 + between[2] / 3) - between[2] * 0.5 + between[1] * 0.5).astype(int),
     np.rint((tips[2] * 1 / 3 + between[1] / 3 + between[2] / 3) + between[2] * 0.5 - between[1] * 0.5).astype(int)
 ])
-
 RING_A.setPoints([
     np.rint((tips[3] * 2 / 3 + between[2] / 6 + between[3] / 6) - between[3] * 0.5 + between[2] * 0.5).astype(int),
     np.rint((tips[3] * 2 / 3 + between[2] / 6 + between[3] / 6) + between[3] * 0.5 - between[2] * 0.5).astype(int),
     np.rint(tips[3] - between[3] * 0.5 + between[2] * 0.5).astype(int),
     np.rint(tips[3] + between[3] * 0.5 - between[2] * 0.5).astype(int)
 ])
-
 RING_B.setPoints([
     np.rint((tips[3] * 1 / 3 + between[2] / 3 + between[3] / 3) - between[3] * 0.5 + between[2] * 0.5).astype(int),
     np.rint((tips[3] * 1 / 3 + between[2] / 3 + between[3] / 3) + between[3] * 0.5 - between[2] * 0.5).astype(int),
     np.rint((tips[3] * 2 / 3 + between[2] / 6 + between[3] / 6) - between[3] * 0.5 + between[2] * 0.5).astype(int),
     np.rint((tips[3] * 2 / 3 + between[2] / 6 + between[3] / 6) + between[3] * 0.5 - between[2] * 0.5).astype(int)
 ])
-
 RING_C.setPoints([
     between[2],
     between[3],
@@ -128,12 +123,71 @@ RING_C.setPoints([
     np.rint((tips[3] * 1 / 3 + between[2] / 3 + between[3] / 3) + between[3] * 0.5 - between[2] * 0.5).astype(int)
 ])
 
-cv2.imshow('MA', MIDDLE_A.drawPoints())
-cv2.imshow('MB', MIDDLE_B.drawPoints())
-cv2.imshow('MC', MIDDLE_C.drawPoints())
-cv2.imshow('RA', RING_A.drawPoints())
-cv2.imshow('RB', RING_B.drawPoints())
-cv2.imshow('RC', RING_C.drawPoints())
+index_approx = between[1] - between[2] + between[1]
+index_approx = c[0][np.linalg.norm((c - index_approx), axis=-1).argmin()][0]
+
+INDEX_A.setPoints([
+    np.rint((tips[1] * 2 / 3 + index_approx / 6 + between[1] / 6) - between[1] * 0.5 + index_approx * 0.5).astype(int),
+    np.rint((tips[1] * 2 / 3 + index_approx / 6 + between[1] / 6) + between[1] * 0.5 - index_approx * 0.5).astype(int),
+    np.rint(tips[1] - between[1] * 0.5 + index_approx * 0.5).astype(int),
+    np.rint(tips[1] + between[1] * 0.5 - index_approx * 0.5).astype(int)
+])
+INDEX_B.setPoints([
+    np.rint((tips[1] * 1 / 3 + index_approx / 3 + between[1] / 3) - between[1] * 0.5 + index_approx * 0.5).astype(int),
+    np.rint((tips[1] * 1 / 3 + index_approx / 3 + between[1] / 3) + between[1] * 0.5 - index_approx * 0.5).astype(int),
+    np.rint((tips[1] * 2 / 3 + index_approx / 6 + between[1] / 6) - between[1] * 0.5 + index_approx * 0.5).astype(int),
+    np.rint((tips[1] * 2 / 3 + index_approx / 6 + between[1] / 6) + between[1] * 0.5 - index_approx * 0.5).astype(int),
+])
+INDEX_C.setPoints([
+    index_approx,
+    between[1],
+    np.rint((tips[1] * 1 / 3 + index_approx / 3 + between[1] / 3) - between[1] * 0.5 + index_approx * 0.5).astype(int),
+    np.rint((tips[1] * 1 / 3 + index_approx / 3 + between[1] / 3) + between[1] * 0.5 - index_approx * 0.5).astype(int),
+])
+
+little_approx = between[3] + between[3] - between[2]
+little_approx = c[0][np.linalg.norm((c - little_approx), axis=-1).argmin()][0]
+
+LITTLE_A.setPoints([
+    np.rint((tips[4] * 2 / 3 + between[3] / 6 + little_approx / 6) - little_approx * 0.5 + between[3] * 0.5).astype(int),
+    np.rint((tips[4] * 2 / 3 + between[3] / 6 + little_approx / 6) + little_approx * 0.5 - between[3] * 0.5).astype(int),
+    np.rint(tips[4] - little_approx * 0.5 + between[3] * 0.5).astype(int),
+    np.rint(tips[4] + little_approx * 0.5 - between[3] * 0.5).astype(int)
+])
+LITTLE_B.setPoints([
+    np.rint((tips[4] * 1 / 3 + between[3] / 3 + little_approx / 3) - little_approx * 0.5 + between[3] * 0.5).astype(int),
+    np.rint((tips[4] * 1 / 3 + between[3] / 3 + little_approx / 3) + little_approx * 0.5 - between[3] * 0.5).astype(int),
+    np.rint((tips[4] * 2 / 3 + between[3] / 6 + little_approx / 6) - little_approx * 0.5 + between[3] * 0.5).astype(int),
+    np.rint((tips[4] * 2 / 3 + between[3] / 6 + little_approx / 6) + little_approx * 0.5 - between[3] * 0.5).astype(int),
+])
+LITTLE_C.setPoints([
+    between[3],
+    little_approx,
+    np.rint((tips[4] * 1 / 3 + between[3] / 3 + little_approx / 3) - little_approx * 0.5 + between[3] * 0.5).astype(int),
+    np.rint((tips[4] * 1 / 3 + between[3] / 3 + little_approx / 3) + little_approx * 0.5 - between[3] * 0.5).astype(int),
+])
+
+thumb_approx = c[0][0][0]
+for cp in c[0]:
+    if between[0][1] < thumb_approx[1]:
+        break
+    thumb_approx = cp[0]
+    pass
+
+# cv2.imshow('MA', MIDDLE_A.drawPoints())
+# cv2.imshow('MB', MIDDLE_B.drawPoints())
+# cv2.imshow('MC', MIDDLE_C.drawPoints())
+# cv2.imshow('RA', RING_A.drawPoints())
+# cv2.imshow('RB', RING_B.drawPoints())
+# cv2.imshow('RC', RING_C.drawPoints())
+cv2.imshow('IA', INDEX_A.drawPoints())
+cv2.imshow('IB', INDEX_B.drawPoints())
+cv2.imshow('IC', INDEX_C.drawPoints())
+
+cv2.imshow('LA', LITTLE_A.drawPoints())
+cv2.imshow('LB', LITTLE_B.drawPoints())
+cv2.imshow('LC', LITTLE_C.drawPoints())
+
 cv2.waitKey()
 cv2.destroyAllWindows()
 
